@@ -1,67 +1,65 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 char * gcdOfStrings( char * str1, char * str2 )
-{
-    // intit pointer for output
-    static char *out ;
-    char ** substrings ;
-    // allocate a single char for null char
-    out = malloc( sizeof( char ) ) ; 
-    substrings = malloc( sizeof( uintptr_t )) ;
-    *substrings = malloc( sizeof( uintptr_t )) ;
-    // init pointer to pointer
-    char *p1 ; 
-    char *p2 ;
+{   
 
-    p1 = str1 ;
-    p2 = str2 ;
+    // put strings in order of length i.e. strlen( str1 ) <= strlen( str2 )
 
-    int i = 0 ;
-    int n_substrings = 0 ;
+    // intit pointers
+    char *out, *p1 ;
 
-    while ((( p1 != &str1[ strlen( str1 ) ]) && (p2 != &str2[ strlen( str2 ) ]))) 
-    {
-        if ( *p1 == *p2 )
-        {
-            if ( i > 0 ){
-                if ( *p1 == substrings[ i - 1 ][ 0 ] )
-                {
-                    return "yes" ;
-                }
-                else 
-                {
-                    for ( int n = 0 ; n < n_substrings ; n++ )
-                    {
-                        substrings[ n ] = substrings[ n + 1 ] ;
-                    }
-                    // substrings = realloc( substrings,  i-- ) ;
-                    i--;
-                }
-            }
-            substrings = realloc( substrings, i+1 ) ;
-            substrings[ i ] = realloc( substrings[ i ], n_substrings+1 ) ;
-            n_substrings++;
-            for ( int j = 0; j < n_substrings ; j++ )
-            {
-                substrings[ i ][ j ] = str1[ j ] ;
-            }
-            substrings[ i ][ n_substrings ] = '\0' ;
-            i++ ;
-            p1++ ;
-            p2++ ;
-            
-        }
-        else { return "" ; }
+    out = ( char* )malloc( sizeof( char ) ) ;
+   
+    p1 = str2 ;
+
+    if( strlen( str1 ) > strlen( str2 ) ){
+         str1 = str2 ; str2 = p1 ;
     }
-    out = substrings[ n_substrings - 1 ] ;
+
+    if( strlen( str1 ) == strlen( str2 ) ){
+        for( int i = 0 ; i < strlen( str2 ) ; i++ )
+        {
+            if( str1[ i ] != str2[ i ] )
+                return "error: strings have equal length but are equal strings.\n" ;
+        }
+    }
+
+    if( strlen( str2 ) % strlen( str1 ) != 0 )
+        return "error: unfactorable.\n" ;
+
+    while( *p1 != '\0' )
+    {
+        
+        if( *p1 !=  *str1 )
+             return "error: start of one or more shortest subintervals not equal to the first letter.\n" ;
+        
+        p1 = p1 + strlen( str1 ) ;
+
+        // check for over-run
+        if( p1 > str2 + strlen( str2 ) )
+            return "CRITICAL ERROR: we have run p1 passed the last memory loc of str2 " ;
+    }
+
+    for( int i = 0 ; i < strlen( str2 ) / strlen( str1 ) ; i = i + strlen( str1 ) )
+    {
+        for( int j = 0 ; j < strlen( str1 ) ; j++ )
+        {
+            if( str2[ i + j ] != str1[ j ] )
+                return "error: substrings do not repeat." ;
+        }
+    }
+    // if we are here then str1 divides str2 or else there are unconsidered  cases
+    out = str1;
     return out ;
 }
 
 int main( void )
 {
-    char *gcd = gcdOfStrings( "ABCB", "ABABC" ) ;
-    printf( "%s", gcd );
+    char *gcd = gcdOfStrings( "AB", "ABABA" ) ;
+
+    printf( "gcd = \"%s", gcd ) ; printf( "%c", '\n' ) ;
+    
     return 0 ;
 }
