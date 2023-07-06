@@ -4,18 +4,25 @@
 
 char * gcdOfStrings( char * str1, char * str2 )
 {   
-
-    // put strings in order of length i.e. strlen( str1 ) <= strlen( str2 )
-
     // intit pointers
-    char *out, *p1 ;
+    char * out, * p1 ;
 
-    out = ( char* )malloc( sizeof( char ) ) ;
+    out = ( char * )malloc( sizeof( char ) ) ;
    
     p1 = str2 ;
 
+    // put strings in order of length i.e. strlen( str1 ) <= strlen( str2 )
     if( strlen( str1 ) > strlen( str2 ) )
         { str1 = str2 ; str2 = p1 ; }
+    
+    // find common factors of string lengths
+    int len_str1 = strlen( str1 ) ;
+    int len_str2 = strlen( str2 ) ; 
+    
+    // create a dynamic array to save common factors
+    int * fac_list = ( int * )malloc( sizeof( int ) ) ;
+    
+    
 
     if( strlen( str1 ) == strlen( str2 ) ){
         for( int i = 0 ; i < strlen( str2 ) ; i++ )
@@ -31,10 +38,9 @@ char * gcdOfStrings( char * str1, char * str2 )
         
         if( strlen( str2 ) % ( strlen( str1 ) / 2 ) == 0 )
             printf( "%s\n\n", "Possible factorization by half length string." ) ;
-            
+
         return "" ; 
     }
-    
     
     while( *p1 != '\0' )
     {
