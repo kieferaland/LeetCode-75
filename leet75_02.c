@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 char * gcdOfStrings( char * str1, char * str2 )
 {   
@@ -22,8 +23,6 @@ char * gcdOfStrings( char * str1, char * str2 )
     // create a dynamic array to save common factors
     int * fac_list = ( int * )malloc( sizeof( int ) ) ;
     
-    
-
     if( strlen( str1 ) == strlen( str2 ) ){
         for( int i = 0 ; i < strlen( str2 ) ; i++ )
         {
