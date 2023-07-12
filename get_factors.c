@@ -11,6 +11,7 @@ int get_factors( int num, int * factors_list )
 		if( num % ( i + 1 ) == 0 )
 		{
 			n_factors = n_factors + 2 ;
+
 			
 			factors_list = ( int * )realloc( factors_list, n_factors * sizeof( int)) ;
 

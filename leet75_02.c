@@ -2,74 +2,90 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "get_factors.h"
 
 char * gcdOfStrings( char * str1, char * str2 )
 {   
     // intit pointers
     char * out, * p1 ;
+    int len_out ;
 
     out = ( char * )malloc( sizeof( char ) ) ;
-   
-    p1 = str2 ;
 
     // put strings in order of length i.e. strlen( str1 ) <= strlen( str2 )
     if( strlen( str1 ) > strlen( str2 ) )
-        { str1 = str2 ; str2 = p1 ; }
+    {
+        p1 = str2 ;
+        str1 = str2 ; 
+        str2 = p1 ; 
+    }
     
     // find common factors of string lengths
-    int len_str1 = strlen( str1 ) ;
-    int len_str2 = strlen( str2 ) ; 
+    int len_s1 = strlen( str1 ) ;
+    int len_s2 = strlen( str2 ) ; 
     
-    // create a dynamic array to save common factors
-    int * fac_list = ( int * )malloc( sizeof( int ) ) ;
+    int * fac_list1 = ( int * )malloc( sizeof( int ) ) ;
+    int * fac_list2 = ( int * )malloc( sizeof( int ) ) ;
+
+    int n_common_facs = 0 ; 
+    int * common_facs_list = ( int * )malloc( sizeof( int ) ) ;
     
-    if( strlen( str1 ) == strlen( str2 ) ){
-        for( int i = 0 ; i < strlen( str2 ) ; i++ )
+    int n_facs1 = get_factors( len_s1, fac_list1 ) ;
+    int n_facs2 = get_factors( len_s2, fac_list2 ) ;
+   
+    print_factors( n_facs1, fac_list1 ) ;
+    print_factors( n_facs2, fac_list2 ) ; 
+
+    for( int i = 0 ; i < len_s1 ; i++ )
+    {
+        if( fac_list1[ i ] == fac_list2[ i ] )
         {
-            if( str1[ i ] != str2[ i ] )
-                { printf( "\n%s\n\n", "Error: strings have equal length but are equal strings.\n") ; return "" ; }
+            n_common_facs++ ;
+            common_facs_list = ( int * )realloc( common_facs_list, n_common_facs ) ;
+            common_facs_list[ i ] = fac_list1[ i ] ;
         }
     }
 
-    if( strlen( str2 ) % strlen( str1 ) != 0 )
-    { 
-        printf( "\n%s\n\n", "Error: unfactorable.") ; 
-        
-        if( strlen( str2 ) % ( strlen( str1 ) / 2 ) == 0 )
-            printf( "%s\n\n", "Possible factorization by half length string." ) ;
-
-        return "" ; 
+    if( n_common_facs > 0 )
+    {
+        printf( "\ncommon factors : [" ) ;
+        for ( int i = 0 ; i < n_common_facs - 1 ; i++ )
+        {
+            printf( "%d, ", common_facs_list[ i ] ) ;
+        }
+        printf( "%d]\n\n", common_facs_list[ n_common_facs - 1 ] ) ;
     }
     
-    while( *p1 != '\0' )
+    int longest_substr_index = -1;
+    int ff = 0 ;
+ 
+    for( int i = 0 ; i < n_common_facs ; i++ ) 
     {
-        if( *p1 !=  *str1 )
-            { printf( "\n%s\n\n", "Error: start of one or more shortest subintervals not equal to the first letter.\n") ; return "" ; }
-        
-        p1 = p1 + strlen( str1 ) ;
-
-        // check for over-run
-        if( p1 > str2 + strlen( str2 ) )
-            { printf( "\n%s\n\n", "CRITICAL ERROR: we have run p1 passed the last memory loc of str2.") ; return "\0"; }
-    }
-
-    for( int i = 0 ; i < strlen( str2 ) / strlen( str1 ) ; i = i + strlen( str1 ) )
-    {
-        for( int j = 0 ; j < strlen( str1 ) ; j++ )
+        ff = 0 ;
+        for( int j = 0 ; j < len_s2 ; j = j + common_facs_list[ i ])
         {
-            if( str2[ i + j ] != str1[ j ] )
-                { printf( "\n%s\n\n", "Error: substrings do not repeat.") ; return "" ; }
-        }
+            for( int k = 0 ; k < common_facs_list[ i ] ; k++ )
+            {
+                if( str1[ k ] !=  str2[ j + k ])
+                {
+                    ff = 1 ;
+                    printf( "setting fail flag and break\n" ) ;
+                    break ;
+                }
+            }
+        if( ff == 1 )
+            { printf("break #2.\n" ) ; break ; }
+        else { longest_substr_index = common_facs_list[ i ] ; }
+        }        
     }
 
-    // if we are here then str1 divides str2 or else there are unconsidered  cases
-    out = str1;
+    printf( "longest_substr_index = %d\n", longest_substr_index ) ;
     return out ;
 }
 
 int main( void )
 {
-    char *gcd = gcdOfStrings( "ABAB", "ABABAB" ) ;
+    char *gcd = gcdOfStrings( "A", "ABABABAB" ) ;
     
     if( *gcd != '\0' )
         { printf( "\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ; return 0 ; }
