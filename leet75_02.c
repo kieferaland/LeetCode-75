@@ -4,90 +4,138 @@
 #include <math.h>
 #include "get_factors.h"
 
+
+
 char * gcdOfStrings( char * str1, char * str2 )
 {   
     // intit pointers
     char * out, * p1 ;
     int len_out ;
-
     out = ( char * )malloc( sizeof( char ) ) ;
-
     // put strings in order of length i.e. strlen( str1 ) <= strlen( str2 )
-    if( strlen( str1 ) > strlen( str2 ) )
-    {
-        p1 = str2 ;
+    if( strlen( str1 ) > strlen( str2 ) ){
+        p1 = str1 ;
         str1 = str2 ; 
         str2 = p1 ; 
     }
-    
-    // find common factors of string lengths
-    int len_s1 = strlen( str1 ) ;
-    int len_s2 = strlen( str2 ) ; 
-    
-    int * fac_list1 = ( int * )malloc( sizeof( int ) ) ;
-    int * fac_list2 = ( int * )malloc( sizeof( int ) ) ;
-
-    int n_common_facs = 0 ; 
+    // init list pointer for common factors
     int * common_facs_list = ( int * )malloc( sizeof( int ) ) ;
-    
-    int n_facs1 = get_factors( len_s1, fac_list1 ) ;
-    int n_facs2 = get_factors( len_s2, fac_list2 ) ;
-   
-    print_factors( n_facs1, fac_list1 ) ;
-    print_factors( n_facs2, fac_list2 ) ; 
+    // get common factors list and num common factors
+    int n_common_facs = get_common_factors( strlen( str1 ), strlen( str2 ), &common_facs_list, 1 ) ; 
 
-    for( int i = 0 ; i < len_s1 ; i++ )
-    {
-        if( fac_list1[ i ] == fac_list2[ i ] )
-        {
-            n_common_facs++ ;
-            common_facs_list = ( int * )realloc( common_facs_list, n_common_facs ) ;
-            common_facs_list[ i ] = fac_list1[ i ] ;
-        }
-    }
-
-    if( n_common_facs > 0 )
-    {
-        printf( "\ncommon factors : [" ) ;
-        for ( int i = 0 ; i < n_common_facs - 1 ; i++ )
-        {
-            printf( "%d, ", common_facs_list[ i ] ) ;
-        }
-        printf( "%d]\n\n", common_facs_list[ n_common_facs - 1 ] ) ;
-    }
-    
-    int longest_substr_index = -1;
+    int substr_len = -1;
     int ff = 0 ;
- 
+    
+    if( n_common_facs == 1 )
+        if( strlen( str1 ) != 1 )
+            return "" ;
+
     for( int i = 0 ; i < n_common_facs ; i++ ) 
     {
-        ff = 0 ;
-        for( int j = 0 ; j < len_s2 ; j = j + common_facs_list[ i ])
+        substr_len = common_facs_list [ i ] ;
+
+        if( common_facs_list[ i ] == 0 )
         {
+            continue ;
+        }
+        for( int j = 0 ; j < strlen( str2 ) ; j = j + common_facs_list[ i ] )
+        {
+
+            // printf( "%c\n", str2[ j ] ) ;
+            
             for( int k = 0 ; k < common_facs_list[ i ] ; k++ )
             {
-                if( str1[ k ] !=  str2[ j + k ])
-                {
-                    ff = 1 ;
-                    printf( "setting fail flag and break\n" ) ;
-                    break ;
+                // printf("str1 = %c, str2 = %c\n", str1[ k ], str2[ j + k ] ) ;
+
+                if( str1[ k ] != str2[ j + k ] )
+                { 
+                
+                    ff = -1 ; 
+
+                    break ; 
+                
+                } else if( ( j + k ) < strlen( str1 ) ){
+                
+            
+                    if( str1[ k ] != str1[ j + k  ] ){
+                
+                        ff = -1;
+                
+                        break ;
+                    }
+
+                    ff = 1 ; 
+                
+                    continue ; 
+                
+                } else{ 
+
+                    
+                
                 }
+            } 
+            if( ff == -1 ){ 
+            
+                substr_len = 0 ; 
+                
+                break ; 
+            
             }
-        if( ff == 1 )
-            { printf("break #2.\n" ) ; break ; }
-        else { longest_substr_index = common_facs_list[ i ] ; }
-        }        
+            else if( ff == 1 ){ 
+            
+                continue ; 
+            
+            }
+        }
     }
 
-    printf( "longest_substr_index = %d\n", longest_substr_index ) ;
+    out = ( char * )realloc( out, ( sizeof(char) * substr_len ) + 1 ) ;
+    
+    for( int i = 0 ; i < substr_len ; i++ )
+    {
+
+        out[ i ] = str1[ i ] ;
+    
+    }
+    
     return out ;
 }
 
 int main( void )
 {
-    char *gcd = gcdOfStrings( "A", "ABABABAB" ) ;
     
-    if( *gcd != '\0' )
-        { printf( "\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ; return 0 ; }
-    else return -1 ;
+    char *
+    
+    gcd = gcdOfStrings( "A", "A" ) ;
+    printf( "\"A\", \"A\"\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ;
+
+    gcd = gcdOfStrings( "A", "AA" ) ;
+    printf( "\"A\", \"AA\"\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ;
+
+    gcd = gcdOfStrings( "A", "AAA" ) ;
+    printf( "\"A\", \"AAA\" \ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ;
+
+    gcd = gcdOfStrings( "AB", "AA" ) ;
+    printf( "\"AB\", \"AA\"\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ;
+
+    gcd = gcdOfStrings( "AB", "AAA" ) ;
+    printf( "\"AB\", \"AAA\"\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ;
+
+    gcd = gcdOfStrings( "AB", "ABAB" ) ;
+    printf( "\"AB\", \"ABAB\"\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ;
+
+    gcd = gcdOfStrings( "AB", "ABABAB" ) ;
+    printf( "\"AB\", \"ABABAB\"\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ;
+
+    gcd = gcdOfStrings( "ABAB", "ABABABAB" ) ;
+    printf( "\"ABAB\", \"ABABABAB\"\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ;
+
+    gcd = gcdOfStrings( "ABC", "ABCABC" ) ;
+    printf( "\"ABC\", \"ABCABC\"\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ; 
+    
+    gcd = gcdOfStrings( "AAAAAAAAA", "AAACCC" ) ;
+    printf( "\"AAAAAAAAA\", \"AAACCC\"\ngcd = \"%s", gcd ) ; printf( "%s", "\"\n\n" ) ;
+    
+    return 0 ;
+
 }
